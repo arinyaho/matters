@@ -1,5 +1,5 @@
 ---
-layout: default
+layout: post
 title: "RAG 보안의 중심은 컨텍스트 레이어다"
 ---
 

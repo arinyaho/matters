@@ -1,5 +1,5 @@
 ---
-layout: default
+layout: post
 title: "The Center of RAG Security Is the Context Layer"
 ---
 
