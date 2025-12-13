@@ -1,5 +1,5 @@
 title: matters
 theme: jekyll-theme-minimal
-baseurl: "/matters"
+baseurl: ""
 url: "https://arinyaho.github.io"
 permalink: /:year/:month/:day/:title.html
