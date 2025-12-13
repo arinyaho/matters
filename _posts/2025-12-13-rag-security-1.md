@@ -1,7 +1,9 @@
 ---
-layout: post
+layout: default
 title: "RAG 보안의 중심은 컨텍스트 레이어다"
 ---
+
+# RAG 보안의 중심은 컨텍스트 레이어다
 
 RAG는 한 단어로 불리지만 구현은 제각각이다. 어떤 팀은 dense search로 시작하고, 어떤 팀은 hybrid를 쓰고, reranking·필터링·요약·프롬프트 템플릿을 얹는다. 더 나아가 그래프 기반으로 “어떤 근거를 언제 가져올지”를 설계하기도 한다.
 
