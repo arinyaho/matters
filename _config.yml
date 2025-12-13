@@ -3,3 +3,4 @@ theme: jekyll-theme-minimal
 baseurl: "/matters"
 url: "https://arinyaho.github.io"
 permalink: /:year/:month/:day/:title.html
+future: true

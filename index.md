@@ -6,5 +6,5 @@ title: matters
 # matters
 
 {% for post in site.posts %}
-- [{{ post.title }}]({{ post.url | relative_url }})
+- [{{ post.title }}]({{ post.url | absolute_url }})
 {% endfor %}
