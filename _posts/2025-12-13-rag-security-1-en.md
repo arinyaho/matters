@@ -1,9 +1,9 @@
 ---
 layout: default
-title: "The Center of RAG Security Is the Context Layer"
+title: "RAG Security (1): The Center of RAG Security Is the Context Layer"
 ---
 
-# The Center of RAG Security Is the Context Layer
+# RAG Security (1): The Center of RAG Security Is the Context Layer
 
 RAG is one word, but the implementations vary wildly. Some teams start with dense retrieval; others go hybrid. Then come reranking, filtering, summarisation, and prompt templates. Some even move towards graph-style flows that decide *which evidence to fetch, when*.
 
