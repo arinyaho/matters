@@ -5,7 +5,7 @@ title: "The Center of RAG Security Is the Context Layer"
 
 # The Center of RAG Security Is the Context Layer
 
-RAG is one word, but the implementations vary wildly. Some teams start with dense retrieval; others go hybrid. Then come reranking, filtering, summarization, and prompt templates. Some even move toward graph-style flows that decide *which evidence to fetch, when*.
+RAG is one word, but the implementations vary wildly. Some teams start with dense retrieval; others go hybrid. Then come reranking, filtering, summarisation, and prompt templates. Some even move towards graph-style flows that decide *which evidence to fetch, when*.
 
 So when the topic turns to security, a question comes first:
 
@@ -13,9 +13,9 @@ So when the topic turns to security, a question comes first:
 
 I think that question points at the core. The more diverse the implementation becomes, the easier it is for the conversation to fragment into a debate about details.
 
-This is Part 1 of my attempt to organize the idea. Rather than claiming a definitive conclusion, I’m proposing a **lens** for where to start so we don’t lose the plot.
+This is Part 1 of my attempt to organise the idea. Rather than claiming a definitive conclusion, I'm proposing a **lens** for where to start so we don't lose the plot.
 
-Instead of listing defenses, I want to first sketch where the **trust boundary and observability surface** start to wobble once a context layer is introduced.
+Instead of listing defenses, I want to first sketch where the **trust boundary and observable signals** start to wobble once a context layer is introduced.
 
 ---
 
@@ -27,7 +27,9 @@ If you try to define RAG by specific implementation details, there’s no end to
 
 Dense vs hybrid vs rerank vs graph vs “prompt engineering” are different ways of implementing what happens inside the parentheses. In that sense, RAG is less a name for a retrieval method and more a way of adding a **context construction layer** to the system.
 
-What matters to me is that this layer isn’t just “fetch a few documents.” It tends to produce multiple artifacts:
+In production, it's often more accurate to view this as a **lifecycle** that also spans ingestion/indexing artefacts (embeddings, indexes, metadata bindings, logs) that persist and get reused.
+
+What matters to me is that this layer isn't just "fetch a few documents." It tends to produce multiple artefacts:
 
 - raw text / chunks
 - candidate lists
@@ -35,19 +37,21 @@ What matters to me is that this layer isn’t just “fetch a few documents.” 
 - retrieval / reranking / filtering outputs
 - the final context (the LLM input)
 
-And these artifacts usually come with operational surfaces: caches, logs, storage, metrics.
+And these artefacts usually come with operational surfaces: caches, logs, storage, metrics.
 
 That’s why I find the following analogy useful:
 
 > RAG is not simply “adding more data to answer better.” It’s closer to adding a **control plane** that decides *what counts as evidence* for the answer.
 
-If the model is the data plane, the context layer becomes a higher-level mechanism that **indirectly steers** the model’s behavior.
+If the model is the data plane, the context layer becomes a higher-level mechanism that **indirectly steers** the model's behaviour.
 
 ---
 
 ## A shifted trust boundary
 
 Even an LLM used alone has security issues. But once RAG is added, the center of gravity often shifts from “the model itself” to the **system’s trust boundary**.
+
+Roughly speaking, legacy search/data systems place boundaries primarily around DB/storage access; RAG shifts boundary pressure towards the **context construction pipeline** (candidates, filtering, reranking, and logging/caching).
 
 A typical RAG-enabled system looks like this:
 
@@ -63,7 +67,7 @@ Risks of this kind are often discussed under names like prompt injection[1][2].
 
 I see “context” not as mere data, but as the model’s *situation definition*—a premise for action. Change the context and the same model produces different answers; in tool-using systems, it may call different tools and make different decisions. Context becoming “evidence” is already risky; once tools are involved, context can become a **trigger for actions**, which makes trust boundary design even more sensitive.
 
-Meanwhile, the context layer tends to grow more complex over time. What starts as “one retrieval step” becomes a pipeline: filters, reranking, summarization, rules, routing—more stages.
+Meanwhile, the context layer tends to grow more complex over time. What starts as "one retrieval step" becomes a pipeline: filters, reranking, summarisation, rules, routing—more stages.
 
 As stages increase, the same things usually happen from a security perspective:
 
@@ -75,7 +79,7 @@ That’s why “RAG security” feels incomplete if we only talk about the model
 
 ---
 
-## Security objective: observability surface
+## Security objective: observable signals
 
 Security conversations often collapse into “is plaintext exposed?” That matters. But in RAG systems, a question one level up is often more decisive:
 
@@ -86,7 +90,7 @@ Here, “observation” is not limited to plaintext. RAG systems generate many m
 - which documents became candidates
 - which documents ended up in top‑k results
 - which queries repeat (patterns/frequency)
-- what topics users appear to seek (behavioral signals)
+- what topics users appear to seek (behavioural signals)
 - and where all of this persists (logs/caches/metrics)
 
 Observability is not only about plaintext—derived representations (e.g., embeddings) can also become sensitive signals depending on system conditions, so *what remains* matters.
@@ -95,16 +99,16 @@ The catch is that protecting *every* intermediate signal in the same way is rare
 
 So in practice, designs often converge to something like this:
 
-Operationally, we still need observability. The goal is not “delete logs,” but to be stricter about *what we record* and *who can access it*—reducing the side effect of sensitive signals accumulating through observation.
+> **Reduce observable signals, starting with the highest-leverage areas.**
 
-> **Reduce the observability surface, starting with the highest‑leverage areas.**
+Operationally, this does **not** mean "delete logs." It means being stricter about *what we record* and *who can access it*—so we can operate and debug the system without letting sensitive signals quietly accumulate.
 
 “High leverage” areas tend to share two properties:
 
 - they accumulate into **long‑lived assets** (stored and reused)
 - if leaked, the blast radius is large (patterns/relationships/interests become structurally visible)
 
-In the context layer, candidates and results matter—but more fundamentally, the **intermediate artifacts created for storage and search** (e.g., embeddings, indexes, caches, logs) often become long‑lived and widely reused as the system scales.
+In the context layer, candidates and results matter—but more fundamentally, the **intermediate artefacts created for storage and search** (e.g., embeddings, indexes, caches, logs) often become long‑lived and widely reused as the system scales.
 
 So the direction I keep coming back to is not “expand the trust boundary,” but closer to:
 
@@ -142,6 +146,10 @@ In the next post, I want to tackle a question people inevitably ask:
 —and share how I currently think about it through the lens of separating security targets.
 
 (For what it’s worth, frameworks like OWASP are useful less as “authority” and more as shared language for aligning risk. NIST AI RMF and Google SAIF are languages for the same purpose[3][4]. In Part 1, I’m deliberately not enumerating checklists—I’m focusing on why the context layer becomes central.)
+
+*Update (2025-12-19): Added a short note clarifying the context layer as a lifecycle spanning ingestion/indexing artefacts.*
+
+*Update (2025-12-29): Adjusted wording for consistency (e.g., “observability surface” → “observable signals”, “assembly” → “construction”).*
 
 ---
 
